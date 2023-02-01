@@ -1,5 +1,5 @@
 name: sample-rust-action
-description: An example GitHub Action written in Rust
+description: An example GitHub Action written in Rust, generated from [dbanty/rust-github-action-template](https://github.com/dbanty/rust-github-action-template). You can either "Use this template" and customize it yourself, or `cargo generate dbanty/rust-github-action-template` to create a new repo from this template.
 author: Dylan Anthony <dbanty@users.noreply.github.com>
 inputs:
   error:

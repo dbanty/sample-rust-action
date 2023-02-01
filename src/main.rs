@@ -2,8 +2,7 @@ use std::env;
 use std::fs::write;
 use std::process::exit;
 
-#[tokio::main]
-async fn main() {
+fn main() {
     let github_output_path = env::var("GITHUB_OUTPUT").unwrap();
 
     let args: Vec<String> = env::args().collect();
