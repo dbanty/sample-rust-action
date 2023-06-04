@@ -11,6 +11,6 @@ outputs:
     description: 'The description of any error that occurred'
 runs:
   using: 'docker'
-  image: 'ghcr.io/dbanty/sample-rust-action:v1'
+  image: 'docker://ghcr.io/dbanty/sample-rust-action:v1'
   args:
     - ${{ inputs.error }}
