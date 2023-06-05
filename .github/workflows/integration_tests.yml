@@ -2,6 +2,9 @@ name: Test consuming this action
 on:
   release:
     types: [published]
+  push:
+    branches:
+      - main
 
 jobs:
   test_success:

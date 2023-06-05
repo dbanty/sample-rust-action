@@ -15,8 +15,8 @@ runs:
   steps:
     - name: Get Action Version
       id: get_action_version
-      shell: pwsh
-      run: Write-Output "version=$(Split-Path -Leaf ${{ github.action_path }})" >> $Env:GITHUB_OUTPUT
+      shell: bash
+      run: echo "version=$(basename ${{ github.action_path }})" >> $Env:GITHUB_OUTPUT
 
     - name: Set Archive Name (Linux)
       if: runner.os == 'Linux'
@@ -33,10 +33,20 @@ runs:
       shell: bash
       run: echo "archive_name=x86_64-pc-windows-msvc" >> $GITHUB_ENV
 
+    - name: Get Action URI (latest)  # This runs for integration tests only
+      shell: bash
+      if: steps.get_action_version.outputs.version == '.'
+      run: echo "action_uri=https://github.com/dbanty/sample-rust-action/releases/latest/download/${{ env.archive_name }}.tgz" >> $GITHUB_ENV
+
+    - name: Get Action URI (specific version)  # This runs for external consumers of the action
+      shell: bash
+      if: steps.get_action_version.outputs.version != '.'
+      run: echo "action_uri=https://github.com/dbanty/sample-rust-action/releases/download/${{ steps.get_action_version.outputs.version }}/${{ env.archive_name }}.tgz"
+
     - name: Download Action
       shell: pwsh
       run: |
-        Invoke-WebRequest -Uri https://github.com/${{ github.action_repository }}/releases/download/${{ steps.get_action_version.outputs.version }}/${{ env.archive_name }}.tgz -OutFile archive.tgz
+        Invoke-WebRequest -Uri ${{ env.action_uri }} -OutFile archive.tgz
         tar -xzf archive.tgz
 
     - name: Run Action
