@@ -13,20 +13,26 @@ outputs:
 runs:
   using: 'composite'
   steps:
+    - name: Set reusable variables
+      shell: bash
+      run: |
+        echo "action_name=${{ env.action_name }}" >> $GITHUB_ENV
+        echo "action_org=dbanty" >> $GITHUB_ENV
+
     - name: Get Action Version
       id: get_action_version
-      shell: bash
-      run: echo "version=$(basename ${{ github.action_path }})" >> $GITHUB_OUTPUT
+      shell: pwsh
+      run: Write-Output "version=$(Split-Path -Leaf ${{ github.action_path }})" >> $Env:GITHUB_OUTPUT
 
     - name: Get Action URI (latest)  # This runs for integration tests only
       shell: bash
-      if: steps.get_action_version.outputs.version == '.'
-      run: echo "action_uri=https://github.com/dbanty/sample-rust-action/releases/latest/download/${{ runner.os }}.tgz" >> $GITHUB_ENV
+      if: steps.get_action_version.outputs.version == env.action_name
+      run: echo "action_uri=https://github.com/${{ env.action_org }}/${{ env.action_name }}/releases/latest/download/${{ runner.os }}.tgz" >> $GITHUB_ENV
 
     - name: Get Action URI (specific version)  # This runs for external consumers of the action
       shell: bash
-      if: steps.get_action_version.outputs.version != '.'
-      run: echo "action_uri=https://github.com/dbanty/sample-rust-action/releases/download/${{ steps.get_action_version.outputs.version }}/${{ runner.os }}.tgz" >> $GITHUB_ENV
+      if: steps.get_action_version.outputs.version != env.action_name
+      run: echo "action_uri=https://github.com/${{ env.action_org }}/${{ env.action_name }}/releases/download/${{ steps.get_action_version.outputs.version }}/${{ runner.os }}.tgz" >> $GITHUB_ENV
 
     - name: Download Action
       shell: pwsh
@@ -36,7 +42,7 @@ runs:
 
     - name: Set Binary Name
       shell: bash
-      run: echo "binary_name=$(if [[ ${{ runner.os }} == 'Windows' ]]; then echo 'sample-rust-action.exe'; else echo 'sample-rust-action'; fi)" >> $GITHUB_ENV
+      run: echo "binary_name=$(if [[ ${{ runner.os }} == 'Windows' ]]; then echo '${{ env.action_name }}.exe'; else echo '${{ env.action_name }}'; fi)" >> $GITHUB_ENV
 
     - name: Run Action
       shell: bash
