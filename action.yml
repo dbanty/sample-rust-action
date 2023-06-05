@@ -36,7 +36,7 @@ runs:
     - name: Download Action
       shell: pwsh
       run: |
-        Invoke-WebRequest -Uri https://github.com/${{ env.github_action_repository }}/releases/download/${{ steps.get_action_version.outputs.version }}/${{ env.archive_name }}.tgz -OutFile archive.tgz
+        Invoke-WebRequest -Uri https://github.com/${{ github.action_repository }}/releases/download/${{ steps.get_action_version.outputs.version }}/${{ env.archive_name }}.tgz -OutFile archive.tgz
         tar -xzf archive.tgz
 
     - name: Run Action
