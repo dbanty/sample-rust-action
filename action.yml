@@ -46,4 +46,5 @@ runs:
 
     - name: Run Action
       shell: bash
+      id: run
       run: ./${{ runner.os }}/${{ env.binary_name }} "${{ inputs.error }}"
