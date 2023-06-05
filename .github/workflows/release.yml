@@ -44,18 +44,18 @@ jobs:
         run: cargo build --release --target ${{ matrix.target }}
 
       - name: Create Archive Folder
-        run: mkdir ${{ matrix.target }}
+        run: mkdir ${{ runner.os }}
 
       - name: Copy Artifact
-        run: cp target/${{ matrix.target }}/release/${{ env.binary_name }} ${{ matrix.target }}
+        run: cp target/${{ matrix.target }}/release/${{ env.binary_name }} ${{ runner.os }}
 
       - name: Create Tar Archive
-        run: tar -czf ${{ matrix.target }}.tgz ${{ matrix.target }}
+        run: tar -czf ${{ runner.os }}.tgz ${{ runner.os }}
 
       - name: Store Archive
         uses: actions/upload-artifact@v3
         with:
-          path: ${{ matrix.target }}.tgz
+          path: ${{ runner.os }}.tgz
   create-release:
     needs: [build-artifacts]
     runs-on: ubuntu-latest
@@ -71,5 +71,4 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "*.tgz"
-          draft: true
           tag: v${{ github.event.inputs.version }}
