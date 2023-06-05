@@ -1,10 +1,12 @@
 name: Test consuming this action
 on:
   release:
-    types: [published]
+    types: [created, published]
   push:
     branches:
       - main
+  workflow_dispatch:
+  merge_group:
 
 jobs:
   test_success:
