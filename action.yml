@@ -6,6 +6,10 @@ inputs:
     description: 'The error message to display, if any'
     required: false
     default: ''
+  token:
+    description: 'The GitHub token to use for downloading the action, defaults to workflow token'
+    required: true
+    default: ${{ github.token }}
 outputs:
   error:
     value: ${{ steps.run.outputs.error }}
@@ -22,23 +26,22 @@ runs:
     - name: Get Action Version
       id: get_action_version
       shell: pwsh
-      run: Write-Output "version=$(Split-Path -Leaf ${{ github.action_path }})" >> $Env:GITHUB_OUTPUT
-
-    - name: Get Action URI (latest)  # This runs for integration tests only
-      shell: bash
-      if: steps.get_action_version.outputs.version == env.action_name
-      run: echo "action_uri=https://github.com/${{ env.action_org }}/${{ env.action_name }}/releases/latest/download/${{ runner.os }}.tgz" >> $GITHUB_ENV
-
-    - name: Get Action URI (specific version)  # This runs for external consumers of the action
-      shell: bash
-      if: steps.get_action_version.outputs.version != env.action_name
-      run: echo "action_uri=https://github.com/${{ env.action_org }}/${{ env.action_name }}/releases/download/${{ steps.get_action_version.outputs.version }}/${{ runner.os }}.tgz" >> $GITHUB_ENV
+      run: |
+        $finalComponent = Split-Path -Leaf ${{ github.action_path }}
+        if ($finalComponent -eq ${{ env.action_name }}) {
+          $version = ""
+        } else {
+          $version = $finalComponent
+        }
+        Write-Output "version=$version" >> $Env:GITHUB_OUTPUT
 
     - name: Download Action
-      shell: pwsh
+      shell: bash
       run: |
-        Invoke-WebRequest -Uri ${{ env.action_uri }} -OutFile archive.tgz
-        tar -xzf archive.tgz
+        gh release download ${{ steps.get_action_version.outputs.version }} --repo ${{ env.action_org }}/${{ env.action_name }} --pattern '${{ runner.os }}.tgz'
+        tar -xzf ${{ runner.os }}.tgz
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
 
     - name: Set Binary Name
       shell: bash
