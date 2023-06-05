@@ -8,9 +8,40 @@ inputs:
     default: ''
 outputs:
   error:
+    value: ${{ steps.run.outputs.error }}
     description: 'The description of any error that occurred'
 runs:
-  using: 'docker'
-  image: 'docker://ghcr.io/dbanty/sample-rust-action:v1'
-  args:
-    - ${{ inputs.error }}
+  using: 'composite'
+  steps:
+    - name: Get Action Version
+      id: get_action_version
+      shell: pwsh
+      run: Write-Output "version=$(Split-Path -Leaf ${{ github.action_path }})" >> $Env:GITHUB_OUTPUT
+
+    - name: Set Archive Name (Linux)
+      if: runner.os == 'Linux'
+      id: set_archive_name
+      shell: bash
+      run: echo "name=x86_64-unknown-linux-musl" >> $GITHUB_OUTPUT
+
+    - name: Set Archive Name (MacOS)
+      if: runner.os == 'macOS'
+      id: set_archive_name
+      shell: bash
+      run: echo "name=x86_64-apple-darwin" >> $GITHUB_OUTPUT
+
+    - name: Set Archive Name (Windows)
+      if: runner.os == 'Windows'
+      id: set_archive_name
+      shell: bash
+      run: echo "name=x86_64-pc-windows-msvc" >> $GITHUB_OUTPUT
+
+    - name: Download Action
+      shell: pwsh
+      run: |
+        Invoke-WebRequest -Uri https://github.com/${{ env.github_action_repository }}/releases/download/${{ steps.get_action_version.outputs.version }}/${{ steps.set_archive_name.outputs.name }}.tgz -OutFile archive.tgz
+        tar -xzf archive.tgz
+
+    - name: Run Action
+      shell: bash
+      run: ./archive/${{ steps.set_archive_name.outputs.name }}/${{ env.binary_name }} ${{ github.event.inputs.error }}
