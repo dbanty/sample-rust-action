@@ -46,20 +46,22 @@ jobs:
       - name: Create Archive Folder
         run: mkdir ${{ matrix.target }}
 
-      - name: Copy Unix Artifact
+      - name: Copy Artifact
         run: cp target/${{ matrix.target }}/release/${{ env.binary_name }} ${{ matrix.target }}
 
       - name: Create Tar Archive
         run: tar -czf ${{ matrix.target }}.tgz ${{ matrix.target }}
 
       - name: Store Archive
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           path: ${{ matrix.target }}.tgz
   create-release:
     needs: [build-artifacts]
     runs-on: ubuntu-latest
     name: Create Release
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v2
