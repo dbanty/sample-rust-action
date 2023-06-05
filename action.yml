@@ -28,7 +28,7 @@ runs:
       shell: pwsh
       run: |
         $finalComponent = Split-Path -Leaf ${{ github.action_path }}
-        if ($finalComponent -eq ${{ env.action_name }}) {
+        if ($finalComponent -eq "${{ env.action_name }}") {
           $version = ""
         } else {
           $version = $finalComponent
