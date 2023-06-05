@@ -16,7 +16,7 @@ runs:
     - name: Get Action Version
       id: get_action_version
       shell: bash
-      run: echo "version=$(basename ${{ github.action_path }})" >> $Env:GITHUB_OUTPUT
+      run: echo "version=$(basename ${{ github.action_path }})" >> $GITHUB_OUTPUT
 
     - name: Set Archive Name (Linux)
       if: runner.os == 'Linux'
@@ -41,7 +41,7 @@ runs:
     - name: Get Action URI (specific version)  # This runs for external consumers of the action
       shell: bash
       if: steps.get_action_version.outputs.version != '.'
-      run: echo "action_uri=https://github.com/dbanty/sample-rust-action/releases/download/${{ steps.get_action_version.outputs.version }}/${{ env.archive_name }}.tgz"
+      run: echo "action_uri=https://github.com/dbanty/sample-rust-action/releases/download/${{ steps.get_action_version.outputs.version }}/${{ env.archive_name }}.tgz" >> $GITHUB_ENV
 
     - name: Download Action
       shell: pwsh
