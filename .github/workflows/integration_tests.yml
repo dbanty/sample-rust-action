@@ -1,12 +1,7 @@
 name: Test consuming this action
 on:
-  pull_request:
-    branches: [v1]
-  workflow_run:
-    workflows: ["Docker Publish"]
-    branches: [v1]
-    types:
-      - completed
+  release:
+    types: [published]
 
 jobs:
   test_success:
