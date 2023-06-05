@@ -16,7 +16,7 @@ runs:
     - name: Set reusable variables
       shell: bash
       run: |
-        echo "action_name=${{ env.action_name }}" >> $GITHUB_ENV
+        echo "action_name=sample-rust-action" >> $GITHUB_ENV
         echo "action_org=dbanty" >> $GITHUB_ENV
 
     - name: Get Action Version
