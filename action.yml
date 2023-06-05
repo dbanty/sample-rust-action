@@ -40,4 +40,4 @@ runs:
 
     - name: Run Action
       shell: bash
-      run: ./${{ runner.os }}/${{ env.binary_name }} ${{ github.event.inputs.error }}
+      run: ./${{ runner.os }}/${{ env.binary_name }} "${{ inputs.error }}"
