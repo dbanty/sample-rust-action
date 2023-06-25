@@ -1,19 +1,13 @@
 name: Test consuming this action
 on:
   release:
-    types: [created, published]
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-  merge_group:
-
+    types: [released]
+  workflow_run:
+    workflows: ["Release"]
+    types: ["completed"]
 jobs:
   test_success:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: ./

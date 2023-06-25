@@ -12,23 +12,30 @@ inputs:
     default: ${{ github.token }}
 outputs:
   error:
-    value: ${{ steps.run.outputs.error }}
     description: 'The description of any error that occurred'
+    value: ${{ steps.run.outputs.error }}
+
 runs:
   using: 'composite'
   steps:
     - name: Set reusable variables
       shell: bash
       run: |
-        echo "action_name=sample-rust-action" >> $GITHUB_ENV
+        echo "action_repo=sample-rust-action" >> $GITHUB_ENV
         echo "action_org=dbanty" >> $GITHUB_ENV
+        echo "binary_name=sample-rust-action" >> $GITHUB_ENV
+
+    - name: Add binary extension
+      shell: bash
+      if: runner.os == 'Windows'
+      run: echo "binary_name=${{ env.binary_name }}.exe" >> $GITHUB_ENV
 
     - name: Get Action Version
       id: get_action_version
       shell: pwsh
       run: |
         $finalComponent = Split-Path -Leaf ${{ github.action_path }}
-        if ($finalComponent -eq "${{ env.action_name }}") {
+        if ($finalComponent -eq "${{ env.action_repo }}") {
           $version = ""
         } else {
           $version = $finalComponent
@@ -38,14 +45,10 @@ runs:
     - name: Download Action
       shell: bash
       run: |
-        gh release download ${{ steps.get_action_version.outputs.version }} --repo ${{ env.action_org }}/${{ env.action_name }} --pattern '${{ runner.os }}.tgz'
+        gh release download ${{ steps.get_action_version.outputs.version }} --repo ${{ env.action_org }}/${{ env.action_repo }} --pattern '${{ runner.os }}.tgz'
         tar -xzf ${{ runner.os }}.tgz
       env:
         GITHUB_TOKEN: ${{ inputs.token }}
-
-    - name: Set Binary Name
-      shell: bash
-      run: echo "binary_name=$(if [[ ${{ runner.os }} == 'Windows' ]]; then echo '${{ env.action_name }}.exe'; else echo '${{ env.action_name }}'; fi)" >> $GITHUB_ENV
 
     - name: Run Action
       shell: bash
