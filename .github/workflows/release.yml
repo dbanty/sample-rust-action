@@ -27,7 +27,7 @@ jobs:
       binary_name: sample-rust-action${{ matrix.file_extension }}
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: Swatinem/rust-cache@v2
 
@@ -63,7 +63,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/download-artifact@v5
       - name: Create Release
         uses: ncipollo/release-action@v1
